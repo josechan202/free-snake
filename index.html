@@ -164,6 +164,15 @@
 
     /* ── Sidebar Ad ── */
     .sidebar-col { display: flex; flex-direction: column; gap: 12px; }
+    .ad-skyscraper { width: 160px; height: 600px; flex-shrink: 0; }
+
+    /* ── Mid-game banner ── */
+    .ad-mid-wrap {
+      width: 100%;
+      padding: 8px 0 4px;
+      display: flex; justify-content: center;
+    }
+    .ad-mid { width: 100%; height: 60px; }
 
     /* ── Footer ad ── */
     .ad-footer-wrap {
@@ -184,6 +193,30 @@
       background: var(--surface); border: 1px solid var(--border);
       padding: 1px 5px; font-family: 'Space Mono', monospace; font-size: 11px; color: var(--text);
     }
+
+    /* ── In-content ad (below instructions) ── */
+    .ad-incontent-wrap {
+      width: 100%; max-width: 800px;
+      padding: 0 16px 16px;
+      display: flex; justify-content: center;
+    }
+
+    /* ── Sticky footer ── */
+    #sticky-footer-ad {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
+      display: flex; justify-content: center; align-items: center;
+      background: var(--bg);
+      border-top: 1px solid var(--border);
+      padding: 6px 0;
+    }
+    #sticky-close {
+      position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+      background: none; border: 1px solid var(--border);
+      color: var(--muted); font-family: 'Space Mono', monospace; font-size: 10px;
+      padding: 2px 6px; cursor: pointer; line-height: 1;
+    }
+    #sticky-close:hover { color: var(--text); border-color: var(--text); }
+    body { padding-bottom: 102px; }
 
     footer {
       width: 100%; max-width: 800px;
@@ -211,7 +244,9 @@
       main { flex-direction: column; }
       .sidebar-col { flex-direction: row; flex-wrap: wrap; justify-content: center; }
       .ad-rectangle { width: 320px; height: 50px; }
+      .ad-skyscraper { display: none; }
       header h1 { font-size: 18px; }
+      #sticky-footer-ad ins { width: 320px !important; height: 50px !important; }
     }
   </style>
 </head>
@@ -274,6 +309,16 @@
         <div></div>
       </div>
 
+      <!-- MID-GAME BANNER: between canvas and d-pad -->
+      <div class="ad-mid-wrap">
+        <ins class="adsbygoogle ad-slot ad-mid"
+             style="display:inline-block;width:100%;height:60px"
+             data-ad-client="ca-pub-XXXXXXXXXX"
+             data-ad-slot="4444444444">
+          <span>Advertisement · 728×60</span>
+        </ins>
+      </div>
+
       <div class="hotkey-row">
         <label for="hotkey-action">HOTKEY</label>
         <select id="hotkey-action">
@@ -290,13 +335,25 @@
 
     </div><!-- /game-col -->
 
-    <!-- SIDEBAR AD RECTANGLE -->
+    <!-- SIDEBAR: two rectangles + skyscraper -->
     <div class="sidebar-col">
       <ins class="adsbygoogle ad-slot ad-rectangle"
            style="display:inline-block;width:300px;height:250px"
            data-ad-client="ca-pub-XXXXXXXXXX"
            data-ad-slot="2222222222">
         <span>Advertisement · 300×250</span>
+      </ins>
+      <ins class="adsbygoogle ad-slot ad-rectangle"
+           style="display:inline-block;width:300px;height:250px"
+           data-ad-client="ca-pub-XXXXXXXXXX"
+           data-ad-slot="5555555555">
+        <span>Advertisement · 300×250</span>
+      </ins>
+      <ins class="adsbygoogle ad-slot ad-skyscraper"
+           style="display:inline-block;width:160px;height:600px"
+           data-ad-client="ca-pub-XXXXXXXXXX"
+           data-ad-slot="6666666666">
+        <span>Advertisement · 160×600</span>
       </ins>
     </div>
 
@@ -322,10 +379,31 @@
     <p>Snake is one of the oldest arcade games, popularized by Nokia phones in the late 1990s. The goal is simple: guide your snake to eat food without crashing. This free browser version requires no download and works on any device.</p>
   </div>
 
+  <!-- IN-CONTENT AD: below instructions -->
+  <div class="ad-incontent-wrap">
+    <ins class="adsbygoogle ad-slot ad-leaderboard"
+         style="display:inline-block;width:728px;height:90px"
+         data-ad-client="ca-pub-XXXXXXXXXX"
+         data-ad-slot="7777777777">
+      <span>Advertisement · 728×90</span>
+    </ins>
+  </div>
+
   <footer>
     <span>Snake Game Online — Free &amp; Unblocked</span>
     <span><a href="#privacy">Privacy Policy</a></span>
   </footer>
+
+  <!-- STICKY FOOTER AD -->
+  <div id="sticky-footer-ad">
+    <ins class="adsbygoogle ad-slot"
+         style="display:inline-block;width:728px;height:90px"
+         data-ad-client="ca-pub-XXXXXXXXXX"
+         data-ad-slot="8888888888">
+      <span>Advertisement · 728×90</span>
+    </ins>
+    <button id="sticky-close" onclick="document.getElementById('sticky-footer-ad').remove(); document.body.style.paddingBottom='0'">✕</button>
+  </div>
 
   <div class="privacy-section" id="privacy">
     <h3>PRIVACY POLICY</h3>
@@ -558,10 +636,10 @@
       nextDir = d;
     }, {passive:true});
 
-    // AdSense push
-    try { (adsbygoogle = window.adsbygoogle || []).push({}); } catch(e){}
-    try { (adsbygoogle = window.adsbygoogle || []).push({}); } catch(e){}
-    try { (adsbygoogle = window.adsbygoogle || []).push({}); } catch(e){}
+    // AdSense push — one per slot
+    [1,2,3,4,5,6,7,8].forEach(() => {
+      try { (adsbygoogle = window.adsbygoogle || []).push({}); } catch(e){}
+    });
 
     draw();
   })();
