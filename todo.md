@@ -3,7 +3,7 @@
 ## AdSense Setup
 - [x] Sign up at google.com/adsense (if no account)
 - [x] Copy publisher ID — `ca-pub-8868754541983053` added to `index.html`
-- [ ] Submit domain `free-snake.org` for AdSense review (approval takes 1–3 days)
+- [x] Submit domain `free-snake.org` for AdSense review (approval takes 1–3 days)
 - [ ] Create ad unit #1 — Leaderboard 728×90 (top) → replace slot `1111111111`
 - [ ] Create ad unit #2 — Rectangle 300×250 (sidebar #1) → replace slot `2222222222`
 - [ ] Create ad unit #3 — Leaderboard 728×90 (footer) → replace slot `3333333333`
@@ -21,14 +21,14 @@
 
 ## Hosting
 - [x] Create GitHub repo → github.com/josechan202/free-snake
-- [ ] Deploy `index.html` to Cloudflare Pages (drag and drop)
-- [ ] Connect `free-snake.org` custom domain in Cloudflare Pages
-- [ ] Confirm live URL loads correctly
+- [x] Deploy `index.html` to Cloudflare Pages
+- [x] Connect `free-snake.org` custom domain in Cloudflare Pages
+- [x] Confirm live URL loads correctly
 - [ ] Test on mobile — verify swipe controls and ad layout work
 
 ## Post-Launch
 - [ ] Add site to Google Search Console
 - [ ] Request indexing for the URL in Search Console
-- [ ] Set up Google Analytics (optional but recommended)
+- [ ] Set up Google Analytics
 - [ ] Verify AdSense ads are serving (can take 24–48 hrs after launch)
 - [ ] Check AdSense policy compliance — ensure no ad placement violations
