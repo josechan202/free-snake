@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>Snake Game Online Free — Play Classic Snake Unblocked</title>
   <meta name="description" content="Play the classic Snake game free online. No download required. Works in any browser, unblocked. How high can you score?">
   <meta property="og:title" content="Snake Game Online Free — Play Classic Snake Unblocked">
@@ -242,12 +242,29 @@
 
     /* ── Mobile ── */
     @media (max-width: 600px) {
+      /* Layout */
       main { flex-direction: column; }
-      .sidebar-col { flex-direction: row; flex-wrap: wrap; justify-content: center; }
-      .ad-rectangle { width: 320px; height: 50px; }
-      .ad-skyscraper { display: none; }
       header h1 { font-size: 18px; }
+
+      /* Hide desktop controls */
+      .dpad-grid { display: none; }
+      .hotkey-row { display: none; }
+
+      /* Collapse sidebar — stack below game */
+      .sidebar-col { flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 8px; }
+
+      /* Resize all ad slots to mobile banner sizes */
+      .ad-leaderboard { width: 320px; height: 50px; }
+      .ad-rectangle   { width: 320px; height: 50px; }
+      .ad-skyscraper  { display: none; }
+      .ad-mid         { height: 50px; }
+      .ad-footer      { width: 320px; height: 50px; }
+
+      /* Sticky footer */
       #sticky-footer-ad ins { width: 320px !important; height: 50px !important; }
+
+      /* Canvas fills full width */
+      #gc { max-width: 100%; }
     }
   </style>
 </head>
@@ -372,7 +389,7 @@
 
   <div class="instructions">
     <h2>HOW TO PLAY</h2>
-    <p>Use <kbd>↑</kbd> <kbd>↓</kbd> <kbd>←</kbd> <kbd>→</kbd> arrow keys (or WASD) to steer the snake. On mobile, tap the d-pad above.</p>
+    <p>Use <kbd>↑</kbd> <kbd>↓</kbd> <kbd>←</kbd> <kbd>→</kbd> arrow keys or WASD on desktop. On mobile, swipe in any direction on the game board to steer. Use two fingers to scroll the page.</p>
     <p>Press <kbd>Space</kbd> to turn left (−90°) by default. Click the HOTKEY button below the d-pad to rebind it to any key, and use the dropdown to change what it does — turn left, turn right, reverse, or force a direction.</p>
     <p>Eat the <span style="color:var(--coral)">&#9632;</span> red food to grow longer and earn points. Don't hit the walls or yourself — game over!</p>
     <p>Adjust the speed slider before or during the game. Higher speed = higher challenge (and higher scores).</p>
@@ -623,19 +640,33 @@
     });
 
     // Swipe support
-    let touchX, touchY;
-    canvas.addEventListener('touchstart', e => { touchX=e.touches[0].clientX; touchY=e.touches[0].clientY; }, {passive:true});
+    let touchX, touchY, touchHandled = false;
+
+    canvas.addEventListener('touchstart', e => {
+      if (e.touches.length > 1) { touchHandled = false; return; }
+      touchHandled = true;
+      e.preventDefault();
+      touchX = e.touches[0].clientX;
+      touchY = e.touches[0].clientY;
+    }, { passive: false });
+
+    canvas.addEventListener('touchmove', e => {
+      if (!touchHandled) return;
+      e.preventDefault();
+    }, { passive: false });
+
     canvas.addEventListener('touchend', e => {
-      if (!running) return;
+      if (!touchHandled || !running) return;
       const dx = e.changedTouches[0].clientX - touchX;
       const dy = e.changedTouches[0].clientY - touchY;
-      if (Math.abs(dx) < 10 && Math.abs(dy) < 10) return;
+      if (Math.abs(dx) < 12 && Math.abs(dy) < 12) return;
       let d;
       if (Math.abs(dx) > Math.abs(dy)) d = dx>0 ? {x:1,y:0} : {x:-1,y:0};
       else                             d = dy>0 ? {x:0,y:1} : {x:0,y:-1};
       if (d.x===-dir.x && d.y===-dir.y) return;
       nextDir = d;
-    }, {passive:true});
+      touchHandled = false;
+    }, { passive: true });
 
     // AdSense push — one per slot
     [1,2,3,4,5,6,7,8].forEach(() => {
