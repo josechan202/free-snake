@@ -598,11 +598,11 @@
         return;
       }
       // Normal movement
+      if (e.key.startsWith('Arrow')) e.preventDefault();
       const d = keyMap[e.key];
       if (!d || !running) return;
       if (d.x===-dir.x && d.y===-dir.y) return;
       nextDir = d;
-      if (e.key.startsWith('Arrow')) e.preventDefault();
     });
 
     function bindDpad(id, d) {
