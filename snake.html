@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Snake Game Online Free — Play Classic Snake Unblocked</title>
+  <meta name="description" content="Play the classic Snake game free online. No download required. Works in any browser, unblocked. How high can you score?">
+  <meta property="og:title" content="Snake Game Online Free — Play Classic Snake Unblocked">
+  <meta property="og:description" content="Play the classic Snake game free online. No download, no login. Just play.">
+  <meta property="og:type" content="website">
+  <link rel="canonical" href="https://free-snake.org/">
+
+  <!-- AdSense — replace ca-pub-XXXXXXXXXX with your publisher ID -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXX" crossorigin="anonymous"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0a;
+      --surface: #111111;
+      --border: #222222;
+      --green: #39ff14;
+      --green-dim: #1a7a08;
+      --coral: #ff5733;
+      --text: #cccccc;
+      --muted: #555555;
+      --ad-bg: #161616;
+      --ad-border: #2a2a2a;
+    }
+
+    html { background: var(--bg); color: var(--text); font-family: 'Space Mono', monospace; font-size: 14px; }
+
+    body { min-height: 100vh; display: flex; flex-direction: column; align-items: center; }
+
+    /* ── Top Ad ── */
+    .ad-leaderboard-wrap {
+      width: 100%; max-width: 800px;
+      padding: 12px 16px 0;
+      display: flex; justify-content: center;
+    }
+    .ad-slot {
+      background: var(--ad-bg);
+      border: 1px dashed var(--ad-border);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--muted); font-size: 11px; letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .ad-leaderboard { width: 728px; height: 90px; max-width: 100%; }
+    .ad-rectangle  { width: 300px; height: 250px; flex-shrink: 0; }
+    .ad-footer     { width: 728px; height: 90px; max-width: 100%; }
+
+    /* ── Header ── */
+    header {
+      width: 100%; max-width: 800px;
+      padding: 16px 16px 8px;
+      display: flex; align-items: baseline; justify-content: space-between;
+    }
+    header h1 { font-size: 22px; font-weight: 700; color: var(--green); letter-spacing: 0.05em; }
+    header p  { font-size: 11px; color: var(--muted); }
+
+    /* ── Main layout ── */
+    main {
+      width: 100%; max-width: 800px;
+      padding: 0 16px;
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+
+    /* ── Game column ── */
+    .game-col { flex: 1; min-width: 0; }
+
+    /* ── HUD ── */
+    .hud {
+      display: flex; justify-content: space-between; align-items: flex-end;
+      padding: 8px 0 6px;
+    }
+    .hud-block { display: flex; flex-direction: column; }
+    .hud-label { font-size: 10px; color: var(--muted); letter-spacing: 0.12em; }
+    .hud-val   { font-size: 24px; font-weight: 700; color: var(--green); line-height: 1; }
+
+    /* ── Canvas ── */
+    #canvas-wrap {
+      position: relative;
+      border: 1px solid var(--border);
+      line-height: 0;
+    }
+    #gc { display: block; width: 100%; max-width: 400px; height: auto; aspect-ratio: 1; image-rendering: pixelated; }
+
+    /* ── Overlay ── */
+    #overlay {
+      position: absolute; inset: 0;
+      background: rgba(10,10,10,0.92);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 10px;
+      transition: opacity 0.2s;
+    }
+    #overlay.hidden { opacity: 0; pointer-events: none; }
+    #overlay-title { font-size: 20px; font-weight: 700; color: var(--green); letter-spacing: 0.1em; }
+    #overlay-sub   { font-size: 12px; color: var(--muted); }
+    #btn-start {
+      margin-top: 4px; padding: 9px 28px;
+      font-family: 'Space Mono', monospace; font-size: 13px; font-weight: 700;
+      background: var(--green); color: #000;
+      border: none; cursor: pointer; letter-spacing: 0.06em;
+    }
+    #btn-start:hover { background: #5fff40; }
+    #btn-start:active { transform: scale(0.97); }
+
+    /* ── Controls row ── */
+    .controls-row {
+      display: flex; align-items: center; gap: 12px;
+      padding: 8px 0 4px;
+      font-size: 11px; color: var(--muted);
+    }
+    .controls-row input[type=range] { flex: 1; accent-color: var(--green); }
+    #speed-out { font-weight: 700; color: var(--text); min-width: 14px; }
+
+    /* ── D-pad ── */
+    .dpad-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 40px);
+      grid-template-rows: repeat(3, 40px);
+      gap: 4px;
+      padding: 8px 0;
+    }
+    .dpad-btn {
+      background: var(--surface); border: 1px solid var(--border);
+      color: var(--text); font-size: 14px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; user-select: none; -webkit-tap-highlight-color: transparent;
+    }
+    .dpad-btn:active { background: var(--border); color: var(--green); }
+    .dpad-center { background: transparent; border: none; }
+
+    /* ── Hotkey row ── */
+    .hotkey-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 6px 0 2px;
+      font-size: 11px; color: var(--muted);
+    }
+    .hotkey-row label { white-space: nowrap; }
+    #hotkey-action {
+      background: var(--surface); border: 1px solid var(--border);
+      color: var(--text); font-family: 'Space Mono', monospace; font-size: 11px;
+      padding: 4px 6px; cursor: pointer;
+    }
+    #hotkey-action:focus { outline: 1px solid var(--green); }
+    #hotkey-key {
+      background: var(--surface); border: 1px solid var(--border);
+      color: var(--green); font-family: 'Space Mono', monospace; font-size: 11px;
+      padding: 4px 8px; cursor: pointer; min-width: 80px; text-align: center;
+      letter-spacing: 0.05em;
+    }
+    #hotkey-key.listening {
+      border-color: var(--green); color: var(--muted);
+      animation: blink 0.8s step-end infinite;
+    }
+    @keyframes blink { 50% { opacity: 0.3; } }
+
+    /* ── Sidebar Ad ── */
+    .sidebar-col { display: flex; flex-direction: column; gap: 12px; }
+
+    /* ── Footer ad ── */
+    .ad-footer-wrap {
+      width: 100%; max-width: 800px;
+      padding: 16px 16px 0;
+      display: flex; justify-content: center;
+    }
+
+    /* ── Instructions ── */
+    .instructions {
+      width: 100%; max-width: 800px;
+      padding: 16px;
+      color: var(--muted); font-size: 12px; line-height: 1.9;
+    }
+    .instructions h2 { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 6px; letter-spacing: 0.08em; }
+    .instructions p  { margin-bottom: 8px; }
+    .instructions kbd {
+      background: var(--surface); border: 1px solid var(--border);
+      padding: 1px 5px; font-family: 'Space Mono', monospace; font-size: 11px; color: var(--text);
+    }
+
+    footer {
+      width: 100%; max-width: 800px;
+      padding: 16px;
+      font-size: 11px; color: var(--muted);
+      border-top: 1px solid var(--border);
+      margin-top: 16px;
+      display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+    }
+    footer a { color: var(--muted); text-decoration: underline; }
+    footer a:hover { color: var(--text); }
+
+    .privacy-section {
+      width: 100%; max-width: 800px;
+      padding: 16px;
+      font-size: 11px; color: var(--muted); line-height: 1.8;
+      border-top: 1px solid var(--border);
+      margin-top: 8px;
+    }
+    .privacy-section h3 { font-size: 12px; font-weight: 700; color: var(--text); margin: 12px 0 4px; letter-spacing: 0.08em; }
+    .privacy-section h3:first-child { margin-top: 0; }
+
+    /* ── Mobile ── */
+    @media (max-width: 600px) {
+      main { flex-direction: column; }
+      .sidebar-col { flex-direction: row; flex-wrap: wrap; justify-content: center; }
+      .ad-rectangle { width: 320px; height: 50px; }
+      header h1 { font-size: 18px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TOP AD LEADERBOARD -->
+  <div class="ad-leaderboard-wrap">
+    <ins class="adsbygoogle ad-slot ad-leaderboard"
+         style="display:inline-block;width:728px;height:90px"
+         data-ad-client="ca-pub-XXXXXXXXXX"
+         data-ad-slot="1111111111">
+      <!-- placeholder label shown before AdSense loads -->
+      <span>Advertisement · 728×90</span>
+    </ins>
+  </div>
+
+  <header>
+    <h1>SNAKE</h1>
+    <p>classic arcade · free · unblocked</p>
+  </header>
+
+  <main>
+    <div class="game-col">
+
+      <div class="hud">
+        <div class="hud-block">
+          <span class="hud-label">SCORE</span>
+          <span class="hud-val" id="score">0</span>
+        </div>
+        <div class="hud-block" style="align-items:flex-end">
+          <span class="hud-label">BEST</span>
+          <span class="hud-val" id="best">0</span>
+        </div>
+      </div>
+
+      <div id="canvas-wrap">
+        <canvas id="gc" width="400" height="400"></canvas>
+        <div id="overlay">
+          <span id="overlay-title">SNAKE</span>
+          <span id="overlay-sub">arrow keys or d-pad to play</span>
+          <button id="btn-start">PLAY</button>
+        </div>
+      </div>
+
+      <div class="controls-row">
+        <span>SPEED</span>
+        <input type="range" id="speed" min="1" max="5" value="3" step="1">
+        <span id="speed-out">3</span>
+      </div>
+
+      <div class="dpad-grid">
+        <div></div>
+        <button class="dpad-btn" id="d-up">▲</button>
+        <div></div>
+        <button class="dpad-btn" id="d-left">◀</button>
+        <div class="dpad-center"></div>
+        <button class="dpad-btn" id="d-right">▶</button>
+        <div></div>
+        <button class="dpad-btn" id="d-down">▼</button>
+        <div></div>
+      </div>
+
+      <div class="hotkey-row">
+        <label for="hotkey-action">HOTKEY</label>
+        <select id="hotkey-action">
+          <option value="turn-left">Turn left (−90°)</option>
+          <option value="turn-right">Turn right (+90°)</option>
+          <option value="reverse">Reverse (180°)</option>
+          <option value="up">Force up</option>
+          <option value="down">Force down</option>
+          <option value="left">Force left</option>
+          <option value="right">Force right</option>
+        </select>
+        <button id="hotkey-key" title="Click to rebind">SPACE</button>
+      </div>
+
+    </div><!-- /game-col -->
+
+    <!-- SIDEBAR AD RECTANGLE -->
+    <div class="sidebar-col">
+      <ins class="adsbygoogle ad-slot ad-rectangle"
+           style="display:inline-block;width:300px;height:250px"
+           data-ad-client="ca-pub-XXXXXXXXXX"
+           data-ad-slot="2222222222">
+        <span>Advertisement · 300×250</span>
+      </ins>
+    </div>
+
+  </main>
+
+  <!-- BOTTOM AD LEADERBOARD -->
+  <div class="ad-footer-wrap">
+    <ins class="adsbygoogle ad-slot ad-footer"
+         style="display:inline-block;width:728px;height:90px"
+         data-ad-client="ca-pub-XXXXXXXXXX"
+         data-ad-slot="3333333333">
+      <span>Advertisement · 728×90</span>
+    </ins>
+  </div>
+
+  <div class="instructions">
+    <h2>HOW TO PLAY</h2>
+    <p>Use <kbd>↑</kbd> <kbd>↓</kbd> <kbd>←</kbd> <kbd>→</kbd> arrow keys (or WASD) to steer the snake. On mobile, tap the d-pad above.</p>
+    <p>Press <kbd>Space</kbd> to turn left (−90°) by default. Click the HOTKEY button below the d-pad to rebind it to any key, and use the dropdown to change what it does — turn left, turn right, reverse, or force a direction.</p>
+    <p>Eat the <span style="color:var(--coral)">&#9632;</span> red food to grow longer and earn points. Don't hit the walls or yourself — game over!</p>
+    <p>Adjust the speed slider before or during the game. Higher speed = higher challenge (and higher scores).</p>
+    <h2 style="margin-top:12px">ABOUT SNAKE</h2>
+    <p>Snake is one of the oldest arcade games, popularized by Nokia phones in the late 1990s. The goal is simple: guide your snake to eat food without crashing. This free browser version requires no download and works on any device.</p>
+  </div>
+
+  <footer>
+    <span>Snake Game Online — Free &amp; Unblocked</span>
+    <span><a href="#privacy">Privacy Policy</a></span>
+  </footer>
+
+  <div class="privacy-section" id="privacy">
+    <h3>PRIVACY POLICY</h3>
+    <p>This site uses Google AdSense to display advertisements. AdSense may use cookies and collect anonymous data such as your IP address, browser type, and pages visited to serve relevant ads. This data is collected by Google, not by this site. This site does not collect, store, or share any personal information.</p>
+    <h3>COOKIES</h3>
+    <p>Google AdSense sets cookies to personalize ads and measure ad performance. You can opt out of personalized advertising by visiting <a href="https://www.google.com/settings/ads" target="_blank" rel="noopener">Google Ad Settings</a>. This site also uses <code>localStorage</code> to save your high score locally in your browser — this data never leaves your device.</p>
+    <h3>THIRD-PARTY LINKS</h3>
+    <p>Advertisements displayed on this site are served by Google and may link to third-party websites. This site is not responsible for the content or privacy practices of those sites.</p>
+    <h3>CONTACT</h3>
+    <p>If you have questions about this privacy policy, you can reach us via the contact information on this site.</p>
+  </div>
+
+  <script>
+  (function() {
+    const COLS = 20, ROWS = 20, CELL = 20;
+    const canvas = document.getElementById('gc');
+    const ctx = canvas.getContext('2d');
+    const scoreEl = document.getElementById('score');
+    const bestEl  = document.getElementById('best');
+    const overlay = document.getElementById('overlay');
+    const overlayTitle = document.getElementById('overlay-title');
+    const overlaySub   = document.getElementById('overlay-sub');
+    const btnStart = document.getElementById('btn-start');
+    const speedSlider = document.getElementById('speed');
+    const speedOut    = document.getElementById('speed-out');
+
+    const SPEEDS = [150, 110, 80, 55, 35];
+    let snake, dir, nextDir, food, score, loop, running = false;
+    let best = parseInt(localStorage.getItem('snakeBest') || '0');
+    bestEl.textContent = best;
+
+    function getInterval() { return SPEEDS[parseInt(speedSlider.value) - 1]; }
+
+    function draw() {
+      ctx.fillStyle = '#0a0a0a';
+      ctx.fillRect(0, 0, 400, 400);
+
+      // grid
+      ctx.strokeStyle = '#161616';
+      ctx.lineWidth = 0.5;
+      for (let i = 0; i <= COLS; i++) {
+        ctx.beginPath(); ctx.moveTo(i*CELL,0); ctx.lineTo(i*CELL,400); ctx.stroke();
+      }
+      for (let i = 0; i <= ROWS; i++) {
+        ctx.beginPath(); ctx.moveTo(0,i*CELL); ctx.lineTo(400,i*CELL); ctx.stroke();
+      }
+
+      // snake
+      snake.forEach((s, i) => {
+        const isHead = i === 0;
+        ctx.fillStyle = isHead ? '#39ff14' : '#1a7a08';
+        ctx.fillRect(s.x*CELL+1, s.y*CELL+1, CELL-2, CELL-2);
+        if (isHead) {
+          // eyes
+          ctx.fillStyle = '#0a0a0a';
+          const ex = dir.x, ey = dir.y;
+          const cx = s.x*CELL + CELL/2, cy = s.y*CELL + CELL/2;
+          const ox = ey*3, oy = ex*3;
+          ctx.fillRect(cx + ex*4 + ox - 1, cy + ey*4 + oy - 1, 2, 2);
+          ctx.fillRect(cx + ex*4 - ox - 1, cy + ey*4 - oy - 1, 2, 2);
+        }
+      });
+
+      // food
+      ctx.fillStyle = '#ff5733';
+      ctx.fillRect(food.x*CELL+3, food.y*CELL+3, CELL-6, CELL-6);
+    }
+
+    function placeFood() {
+      let pos;
+      do { pos = { x: Math.floor(Math.random()*COLS), y: Math.floor(Math.random()*ROWS) }; }
+      while (snake.some(s => s.x===pos.x && s.y===pos.y));
+      food = pos;
+    }
+
+    function startGame() {
+      snake = [{x:10,y:10},{x:9,y:10},{x:8,y:10}];
+      dir = {x:1,y:0}; nextDir = {x:1,y:0};
+      score = 0; scoreEl.textContent = '0';
+      placeFood();
+      overlay.classList.add('hidden');
+      running = true;
+      clearInterval(loop);
+      loop = setInterval(tick, getInterval());
+      draw();
+    }
+
+    function tick() {
+      dir = nextDir;
+      const head = { x: snake[0].x + dir.x, y: snake[0].y + dir.y };
+      if (head.x<0||head.x>=COLS||head.y<0||head.y>=ROWS||snake.some(s=>s.x===head.x&&s.y===head.y)) {
+        endGame(); return;
+      }
+      snake.unshift(head);
+      if (head.x===food.x && head.y===food.y) {
+        score++;
+        scoreEl.textContent = score;
+        if (score > best) {
+          best = score;
+          bestEl.textContent = best;
+          localStorage.setItem('snakeBest', best);
+        }
+        placeFood();
+      } else {
+        snake.pop();
+      }
+      draw();
+    }
+
+    function endGame() {
+      running = false; clearInterval(loop);
+      overlayTitle.textContent = 'GAME OVER';
+      overlaySub.textContent = 'score: ' + score;
+      btnStart.textContent = 'PLAY AGAIN';
+      overlay.classList.remove('hidden');
+      draw();
+    }
+
+    btnStart.addEventListener('click', startGame);
+
+    // ── Hotkey system ────────────────────────────────────────────────────────
+    const hotkeyKeyEl    = document.getElementById('hotkey-key');
+    const hotkeyActionEl = document.getElementById('hotkey-action');
+
+    // turn-left is default action; Space is default key
+    let hotkeyCode   = ' ';       // the key value that triggers the hotkey
+    let hotkeyAction = 'turn-left';
+    let listening    = false;
+
+    function turnLeft()  { return { x: dir.y, y: -dir.x }; }
+    function turnRight() { return { x: -dir.y, y: dir.x }; }
+
+    function applyHotkey() {
+      if (!running) return;
+      let d;
+      switch (hotkeyAction) {
+        case 'turn-left':  d = turnLeft();  break;
+        case 'turn-right': d = turnRight(); break;
+        case 'reverse':    d = { x: -dir.x, y: -dir.y }; break;
+        case 'up':    d = {x:0,y:-1}; break;
+        case 'down':  d = {x:0,y:1};  break;
+        case 'left':  d = {x:-1,y:0}; break;
+        case 'right': d = {x:1,y:0};  break;
+      }
+      // don't allow direct reverse (would kill the snake) unless action is explicitly 'reverse'
+      if (hotkeyAction !== 'reverse' && d.x === -dir.x && d.y === -dir.y) return;
+      nextDir = d;
+    }
+
+    function labelFor(code) {
+      if (code === ' ')          return 'SPACE';
+      if (code === 'Enter')      return 'ENTER';
+      if (code === 'Tab')        return 'TAB';
+      if (code === 'Backspace')  return 'BKSP';
+      if (code === 'Escape')     return 'ESC';
+      if (code.startsWith('Arrow')) return code.replace('Arrow','↑↓←→'.split('').find((_,i)=>['Up','Down','Left','Right'][i]===code.slice(5)) || code.slice(5)).toUpperCase();
+      return code.toUpperCase();
+    }
+
+    hotkeyKeyEl.addEventListener('click', () => {
+      listening = true;
+      hotkeyKeyEl.classList.add('listening');
+      hotkeyKeyEl.textContent = 'PRESS KEY…';
+    });
+
+    hotkeyActionEl.addEventListener('change', () => {
+      hotkeyAction = hotkeyActionEl.value;
+    });
+
+    // ── Unified keydown handler ───────────────────────────────────────────────
+    const keyMap = {
+      ArrowUp:{x:0,y:-1}, ArrowDown:{x:0,y:1},
+      ArrowLeft:{x:-1,y:0}, ArrowRight:{x:1,y:0},
+      w:{x:0,y:-1}, s:{x:0,y:1}, a:{x:-1,y:0}, d:{x:1,y:0}
+    };
+    document.addEventListener('keydown', e => {
+      // Rebind mode: capture next key
+      if (listening) {
+        if (['Control','Shift','Alt','Meta'].includes(e.key)) return;
+        hotkeyCode = e.key;
+        hotkeyKeyEl.textContent = labelFor(e.key);
+        hotkeyKeyEl.classList.remove('listening');
+        listening = false;
+        e.preventDefault();
+        return;
+      }
+      // Hotkey trigger
+      if (e.key === hotkeyCode) {
+        applyHotkey();
+        e.preventDefault();
+        return;
+      }
+      // Normal movement
+      const d = keyMap[e.key];
+      if (!d || !running) return;
+      if (d.x===-dir.x && d.y===-dir.y) return;
+      nextDir = d;
+      if (e.key.startsWith('Arrow')) e.preventDefault();
+    });
+
+    function bindDpad(id, d) {
+      document.getElementById(id).addEventListener('click', () => {
+        if (!running) return;
+        if (d.x===-dir.x && d.y===-dir.y) return;
+        nextDir = d;
+      });
+    }
+    bindDpad('d-up',    {x:0,y:-1});
+    bindDpad('d-down',  {x:0,y:1});
+    bindDpad('d-left',  {x:-1,y:0});
+    bindDpad('d-right', {x:1,y:0});
+
+    speedSlider.addEventListener('input', () => {
+      speedOut.textContent = speedSlider.value;
+      if (running) { clearInterval(loop); loop = setInterval(tick, getInterval()); }
+    });
+
+    // Swipe support
+    let touchX, touchY;
+    canvas.addEventListener('touchstart', e => { touchX=e.touches[0].clientX; touchY=e.touches[0].clientY; }, {passive:true});
+    canvas.addEventListener('touchend', e => {
+      if (!running) return;
+      const dx = e.changedTouches[0].clientX - touchX;
+      const dy = e.changedTouches[0].clientY - touchY;
+      if (Math.abs(dx) < 10 && Math.abs(dy) < 10) return;
+      let d;
+      if (Math.abs(dx) > Math.abs(dy)) d = dx>0 ? {x:1,y:0} : {x:-1,y:0};
+      else                             d = dy>0 ? {x:0,y:1} : {x:0,y:-1};
+      if (d.x===-dir.x && d.y===-dir.y) return;
+      nextDir = d;
+    }, {passive:true});
+
+    // AdSense push
+    try { (adsbygoogle = window.adsbygoogle || []).push({}); } catch(e){}
+    try { (adsbygoogle = window.adsbygoogle || []).push({}); } catch(e){}
+    try { (adsbygoogle = window.adsbygoogle || []).push({}); } catch(e){}
+
+    draw();
+  })();
+  </script>
+</body>
+</html>
