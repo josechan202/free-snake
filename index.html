@@ -672,17 +672,32 @@
     });
 
     // Swipe support
-    let touchX, touchY, touchHandled = false;
+    let touchX, touchY, touchStartX, touchStartY, touchHandled = false, touchMoved = false;
+    let twoFingerStartY = null;
 
     canvas.addEventListener('touchstart', e => {
-      if (e.touches.length > 1) { touchHandled = false; return; }
+      if (e.touches.length > 1) {
+        touchHandled = false;
+        twoFingerStartY = e.touches[0].clientY;
+        return;
+      }
       touchHandled = true;
+      touchMoved = false;
       e.preventDefault();
-      touchX = e.touches[0].clientX;
-      touchY = e.touches[0].clientY;
+      touchX = touchStartX = e.touches[0].clientX;
+      touchY = touchStartY = e.touches[0].clientY;
     }, { passive: false });
 
     canvas.addEventListener('touchmove', e => {
+      // Two-finger: only allow scrolling down
+      if (e.touches.length > 1) {
+        if (twoFingerStartY !== null) {
+          const dy = e.touches[0].clientY - twoFingerStartY;
+          if (dy < 0) e.preventDefault(); // block upward scroll
+        }
+        return;
+      }
+
       if (!touchHandled) return;
       e.preventDefault();
 
@@ -692,6 +707,7 @@
 
       if (Math.abs(dx) < 20 && Math.abs(dy) < 20) return;
 
+      touchMoved = true;
       let d;
       if (Math.abs(dx) > Math.abs(dy)) d = dx > 0 ? {x:1,y:0} : {x:-1,y:0};
       else                             d = dy > 0 ? {x:0,y:1} : {x:0,y:-1};
@@ -702,8 +718,14 @@
       touchY = e.touches[0].clientY;
     }, { passive: false });
 
-    canvas.addEventListener('touchend', () => {
+    canvas.addEventListener('touchend', e => {
+      // Tap: finger lifted without significant movement → turn left -90°
+      if (touchHandled && !touchMoved && running) {
+        const d = turnLeft();
+        if (!(d.x === -dir.x && d.y === -dir.y)) nextDir = d;
+      }
       touchHandled = false;
+      twoFingerStartY = null;
     }, { passive: true });
 
     const SCROLL_AMT = 120;
