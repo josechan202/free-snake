@@ -715,7 +715,10 @@
     let touchX, touchY, touchStartX, touchStartY, touchHandled = false, touchMoved = false;
     let twoFingerStartY = null;
 
-    canvas.addEventListener('touchstart', e => {
+    const INTERACTIVE = ['BUTTON', 'INPUT', 'SELECT', 'TEXTAREA', 'A', 'INS', 'LABEL'];
+
+    document.addEventListener('touchstart', e => {
+      if (INTERACTIVE.includes(e.target.tagName)) { touchHandled = false; return; }
       if (e.touches.length > 1) {
         touchHandled = false;
         twoFingerStartY = e.touches[0].clientY;
@@ -728,12 +731,12 @@
       touchY = touchStartY = e.touches[0].clientY;
     }, { passive: false });
 
-    canvas.addEventListener('touchmove', e => {
+    document.addEventListener('touchmove', e => {
       // Two-finger: only allow scrolling down
       if (e.touches.length > 1) {
         if (twoFingerStartY !== null) {
           const dy = e.touches[0].clientY - twoFingerStartY;
-          if (dy < 0) e.preventDefault(); // block upward scroll
+          if (dy < 0) e.preventDefault();
         }
         return;
       }
@@ -758,7 +761,7 @@
       touchY = e.touches[0].clientY;
     }, { passive: false });
 
-    canvas.addEventListener('touchend', e => {
+    document.addEventListener('touchend', e => {
       // Tap: finger lifted without significant movement → turn left -90°
       if (touchHandled && !touchMoved && running) {
         const d = turnLeft();
